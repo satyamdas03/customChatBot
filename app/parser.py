@@ -17,16 +17,25 @@ class ParseResponse(BaseModel):
 router = APIRouter(prefix="/parse", tags=["Parsing"])
 
 def parse_intent(text: str) -> str:
-    """
-    Naïve keyword matcher: looks for any example phrase in the input.
-    Returns the first matching intent name, or 'unknown'.
+
+    """    Keyword matcher that picks the intent whose example (keyword/phrase)
+    is the longest match in the input. Falls back to 'unknown'.
     """
     text_l = text.lower()
+    matches = []
     for intent in INTENTS:
         for example in intent["examples"]:
             if example in text_l:
-                return intent["name"]
-    return "unknown"
+                # record (intent_name, length_of_match)
+                matches.append((intent["name"], len(example)))
+    if not matches:
+        return "unknown"
+    # pick the intent whose example is the longest phrase
+    matches.sort(key=lambda x: x[1], reverse=True)
+    return matches[0][0]
+
+    
+
 
 @router.post("/", response_model=ParseResponse)
 async def parse_endpoint(req: ParseRequest):
