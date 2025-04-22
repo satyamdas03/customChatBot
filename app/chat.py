@@ -53,7 +53,7 @@ from app.functions import turn_on_device, turn_off_device
 async def chat_endpoint(req: ChatRequest):
     try:
         resp = openai.chat.completions.create(
-            model="gpt-3.5-turbo-0613",
+            model="gpt-3.5-turbo",
             messages=[{"role":"user","content":req.user_input}],
             functions=function_defs,
             function_call="auto"
