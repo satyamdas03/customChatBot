@@ -6,8 +6,13 @@ load_dotenv()
 
 app = FastAPI()
 
-from app.parser import router as parser_router
-app.include_router(parser_router)
+#include parsing router
+from app.parser import router as parse_router
+app.include_router(parse_router)
+
+#include action router
+from app.actions import router as action_router
+app.include_router(action_router)
 
 
 @app.get("/health")
