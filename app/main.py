@@ -13,3 +13,7 @@ async def health_check():
 @app.get("/env")
 async def show_env():
     return {"openai_key_present": bool(os.getenv("OPENAI_API_KEY"))}
+
+@app.get("/")
+async def root():
+    return {"message": "Welcome to Custom Chatbot API"}
