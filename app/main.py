@@ -6,6 +6,10 @@ load_dotenv()
 
 app = FastAPI()
 
+from app.parser import router as parser_router
+app.include_router(parser_router)
+
+
 @app.get("/health")
 async def health_check():
     return {"status": "ok"}

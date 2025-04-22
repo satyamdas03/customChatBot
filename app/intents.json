@@ -1,0 +1,39 @@
+{
+    "intents": [
+        {
+            "name": "greeting",
+            "examples": [
+                "hello",
+                "hi",
+                "hey",
+                "good morning",
+                "good evening"
+            ]
+        },
+        {
+            "name": "goodbye",
+            "examples": [
+                "bye",
+                "goodbye",
+                "see you",
+                "farewell"
+            ]
+        },
+        {
+            "name": "turn_on_device",
+            "examples": [
+                "turn on the",
+                "switch on the",
+                "power on the"
+            ]
+        },
+        {
+            "name": "turn_off_device",
+            "examples": [
+                "turn off the",
+                "switch off the",
+                "power off the"
+            ]
+        }
+    ]
+}
