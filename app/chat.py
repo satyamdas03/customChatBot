@@ -3,7 +3,7 @@ import json
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 import openai
-from typing import Optional, List
+from typing import Optional, List, Dict
 from uuid import uuid4
 
 # Simple in‑process context store: { session_id: [ {role, content}, … ] }
@@ -20,13 +20,6 @@ class ChatResponse(BaseModel):
     session_id: str                     # echo back so client can reuse
     response: str
     history: List[dict]  # (optional) full message history if you want
-
-# request/response models
-class ChatRequest(BaseModel):
-    user_input: str
-
-class ChatResponse(BaseModel):
-    response: str
 
 router = APIRouter(prefix="/chat", tags=["Chat"])
 
