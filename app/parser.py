@@ -2,6 +2,7 @@ import json
 import os
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
+from typing import Optional 
 
 # Load intents file once
 _intents_path = os.path.join(os.path.dirname(__file__), "intents.json")
