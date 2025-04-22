@@ -14,6 +14,9 @@ app.include_router(parse_router)
 from app.actions import router as action_router
 app.include_router(action_router)
 
+# include the chat endpoint
+from app.chat import router as chat_router
+app.include_router(chat_router)
 
 @app.get("/health")
 async def health_check():
