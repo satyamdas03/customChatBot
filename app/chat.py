@@ -52,7 +52,7 @@ from app.functions import turn_on_device, turn_off_device
 @router.post("/", response_model=ChatResponse)
 async def chat_endpoint(req: ChatRequest):
     try:
-        resp = openai.ChatCompletion.create(
+        resp = openai.chat.completions.create(
             model="gpt-3.5-turbo-0613",
             messages=[{"role":"user","content":req.user_input}],
             functions=function_defs,
