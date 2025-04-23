@@ -1,4 +1,3 @@
-// src/components/ChatWindow.tsx
 import { Box, VStack, Input, Button, Text, Spinner } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -12,7 +11,6 @@ export default function ChatWindow() {
   const [sessionId, setSessionId] = useState<string>();
   const [loading, setLoading] = useState(false);
 
-  // On mount, load or create a session ID
   useEffect(() => {
     let sid = localStorage.getItem("chat_session");
     if (!sid) {
@@ -24,7 +22,6 @@ export default function ChatWindow() {
 
   const send = async () => {
     if (!text.trim() || !sessionId) return;
-    // Optimistically show user message
     setMsgs((m) => [...m, { role: "user", content: text }]);
     setLoading(true);
 
@@ -33,23 +30,17 @@ export default function ChatWindow() {
         session_id: sessionId,
         user_input: text,
       });
-      // append assistant reply
       setMsgs((m) => [
         ...m,
         { role: "assistant", content: res.data.response },
       ]);
     } catch (err: unknown) {
-        // narrow to Error or fallback
-        const msg =
-            err instanceof Error
-                ? err.message
-                : (typeof err === "object" && err !== null && "toString" in err)
-                ? String(err)
-                : "Unknown error";
-        setMsgs((m) => [
-            ...m,
-            { role: "assistant", content: `⚠️ Error: ${msg}` },
-        ]);
+      const msg =
+        err instanceof Error ? err.message : String(err);
+      setMsgs((m) => [
+        ...m,
+        { role: "assistant", content: `⚠️ Error: ${msg}` },
+      ]);
     } finally {
       setLoading(false);
       setText("");
@@ -61,43 +52,51 @@ export default function ChatWindow() {
       w="400px"
       h="600px"
       border="1px solid"
-      borderColor="gray.200"
+      borderColor="gray.600"
       borderRadius="lg"
       p={4}
       gap={3}
       align="stretch"
+      bg="gray.700"
     >
-      <Box flexGrow={1} overflowY="auto">
+      <Box flexGrow={1} overflowY="auto" px={2}>
         {msgs.map((m, i) => (
           <Box
             key={i}
-            bg={m.role === "user" ? "blue.50" : "gray.50"}
+            bg={m.role === "user" ? "blue.200" : "gray.200"}
+            color="black"                     // force black text
             alignSelf={m.role === "user" ? "flex-end" : "flex-start"}
-            px={3}
+            px={4}
             py={2}
             borderRadius="md"
             mb={2}
             maxW="80%"
+            boxShadow="sm"
           >
             <Text>{m.content}</Text>
           </Box>
         ))}
         {loading && (
-          <Spinner size="sm" alignSelf="flex-start" mt={2} color="teal.400" />
+          <Spinner size="sm" alignSelf="flex-start" mt={2} color="teal.300" />
         )}
       </Box>
 
       <Box display="flex">
         <Input
           value={text}
-          onChange={(e) => setText(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setText(e.target.value)
+          }
           placeholder="Type a message…"
           mr={2}
           onKeyDown={(e) => {
             if (e.key === "Enter") send();
           }}
+          bg="gray.600"
+          color="white"
+          _placeholder={{ color: "gray.400" }}
         />
-        <Button onClick={send} loading={loading}>
+        <Button loading={loading} onClick={send} colorScheme="teal">
           Send
         </Button>
       </Box>
