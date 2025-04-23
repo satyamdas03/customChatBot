@@ -1,16 +1,59 @@
 // src/components/ChatWindow.tsx
-import React, { ChangeEvent, useState } from "react";
-import { Box, VStack, Input, Button, Text } from "@chakra-ui/react";
+import { Box, VStack, Input, Button, Text, Spinner } from "@chakra-ui/react";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { v4 as uuidv4 } from "uuid";
+
+type Message = { role: string; content: string };
 
 export default function ChatWindow() {
-  const [msgs, setMsgs] = useState<{ role: string; content: string }[]>([]);
+  const [msgs, setMsgs] = useState<Message[]>([]);
   const [text, setText] = useState("");
+  const [sessionId, setSessionId] = useState<string>();
+  const [loading, setLoading] = useState(false);
 
-  // For now, just echo locally
-  const send = () => {
-    if (!text.trim()) return;
-    setMsgs([...msgs, { role: "user", content: text }, { role: "assistant", content: text }]);
-    setText("");
+  // On mount, load or create a session ID
+  useEffect(() => {
+    let sid = localStorage.getItem("chat_session");
+    if (!sid) {
+      sid = uuidv4();
+      localStorage.setItem("chat_session", sid);
+    }
+    setSessionId(sid);
+  }, []);
+
+  const send = async () => {
+    if (!text.trim() || !sessionId) return;
+    // Optimistically show user message
+    setMsgs((m) => [...m, { role: "user", content: text }]);
+    setLoading(true);
+
+    try {
+      const res = await axios.post("/chat", {
+        session_id: sessionId,
+        user_input: text,
+      });
+      // append assistant reply
+      setMsgs((m) => [
+        ...m,
+        { role: "assistant", content: res.data.response },
+      ]);
+    } catch (err: unknown) {
+        // narrow to Error or fallback
+        const msg =
+            err instanceof Error
+                ? err.message
+                : (typeof err === "object" && err !== null && "toString" in err)
+                ? String(err)
+                : "Unknown error";
+        setMsgs((m) => [
+            ...m,
+            { role: "assistant", content: `⚠️ Error: ${msg}` },
+        ]);
+    } finally {
+      setLoading(false);
+      setText("");
+    }
   };
 
   return (
@@ -34,20 +77,29 @@ export default function ChatWindow() {
             py={2}
             borderRadius="md"
             mb={2}
+            maxW="80%"
           >
             <Text>{m.content}</Text>
           </Box>
         ))}
+        {loading && (
+          <Spinner size="sm" alignSelf="flex-start" mt={2} color="teal.400" />
+        )}
       </Box>
 
       <Box display="flex">
         <Input
           value={text}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => setText(e.target.value)}
+          onChange={(e) => setText(e.target.value)}
           placeholder="Type a message…"
           mr={2}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") send();
+          }}
         />
-        <Button onClick={send}>Send</Button>
+        <Button onClick={send} loading={loading}>
+          Send
+        </Button>
       </Box>
     </VStack>
   );
